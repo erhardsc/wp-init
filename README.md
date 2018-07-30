@@ -46,6 +46,12 @@ Run this command inside the directory you just made
 When prompted for the dbhost, specify 127.0.0.1 instead of localhost
 https://wordpress.stackexchange.com/questions/235483/mamp-pro-wp-cli-error-error-establishing-a-database-connection
 
+# Setup - Vagrant
+
+- Change synced_folder default ownership to vagrant
+
+`config.vm.synced_folder ".", "/vagrant/sites"`
+
 # Usage - Vagrant
 
 Navigate to the vagrant folder on your local machine
