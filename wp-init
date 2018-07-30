@@ -6,29 +6,30 @@
 #
 # Execute this script inside the directory you want a WordPress install in
 RED='\033[0;31m'
+GREEN='\033[0;32m'
 NC='\033[0m' # No Color
 
 if [[ -z "$1" ]]
   then
-    echo "Please supply the local SITE URL in the first parameter"
+    echo -e "${RED}Usage${NC}: Please supply the local SITE URL in the first parameter"
     exit 1
 fi
 
 if [[ -z "$2" ]]
   then
-    echo "Please supply the SITE TITLE in the second parameter"
+    echo -e "${RED}Usage${NC}: Please supply the SITE TITLE in the second parameter"
     exit 1
 fi
 
 if [[ -z "$3" ]]
   then
-    echo "Please supply the USERNAME in the third parameter"
+    echo -e "${RED}Usage${NC}: Please supply the USERNAME in the third parameter"
     exit 1
 fi
 
 if [[ -z "$4" ]]
   then
-    echo "Please supply the ADMIN EMAIL in the forth parameter"
+    echo -e "${RED}Usage${NC}: Please supply the ADMIN EMAIL in the forth parameter"
     exit 1
 fi
 
@@ -49,9 +50,28 @@ wp theme delete twentyseventeen twentysixteen twentyfifteen
 
 # Get rid of default plugins
 wp plugin delete akismet hello
-
-echo -e "\n${RED}Setup is not complete!${NC}"
-echo -e "\nMake sure you update your Apache ${RED}httpd-vhosts${NC} and ${RED}hosts${NC} file with the URL and PATH you specified"
+echo -e "\nUpdating Apache ${RED}httpd-vhosts${NC} and ${RED}/etc/hosts${NC} file with the URL and PATH you specified"
 
 echo -e "\n${RED}URL:${NC} https://$1/"
 echo -e "${RED}PATH:${NC} `pwd`"
+echo "<VirtualHost *:443>
+    SSLEngine On
+    SSLCertificateFile /Users/sumnererhard/ssl/server.crt
+    SSLCertificateKeyFile /Users/sumnererhard/ssl/server.key
+
+    ServerAdmin localhost
+    DocumentRoot "\"`pwd`\""
+    ServerName "\"$1"\"
+    ErrorLog "\"/Applications/MAMP/logs/$2-error_log"\"
+</VirtualHost>" >> /Applications/MAMP/conf/apache/extra/httpd-vhosts.conf
+echo -e "\n${GREEN}Complete${NC} httpd-vhosts.conf file updated"
+
+echo -e "\nPlease enter your password in order to update your /etc/hosts file"
+echo "127.0.0.1   $1" | sudo tee -a /etc/hosts >> /dev/null
+echo -e "\n${GREEN}Complete${NC}: /etc/host file updated"
+
+echo -e "\n${GREEN}Install Complete${NC}"
+echo -e "\n${RED}USERNAME:${NC} $3"
+echo -e "\n${RED}PASS:${NC} Password1"
+
+echo -e "\nManaully restart MAMP"
