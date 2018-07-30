@@ -3,6 +3,9 @@ Create a WordPress install using the WP-CLI
 
 This script is intended for developers using MAMP
 
+When prompted for the DBhost, specify 127.0.0.1 instead of localhost
+https://wordpress.stackexchange.com/questions/235483/mamp-pro-wp-cli-error-error-establishing-a-database-connection
+
 Add the path to your MAMP PHP Version to your ~/.bash_profile
 
 `export MAMP_PATH=/Applications/MAMP/bin/php/php7.1.12/bin`
