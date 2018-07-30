@@ -48,7 +48,7 @@ https://wordpress.stackexchange.com/questions/235483/mamp-pro-wp-cli-error-error
 
 # Setup - Vagrant
 
-- Change synced_folder default ownership to vagrant
+- Set synced_folder ownership to it's default (vagrant) in the VagrantFile
 
 `config.vm.synced_folder ".", "/vagrant/sites"`
 
