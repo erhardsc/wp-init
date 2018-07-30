@@ -29,7 +29,7 @@ https://laurenpittenger.com/wpcli-error-establishing-database-connection-mamp/
 
 `export PATH=$PATH:/appropriate/directory`
 
-run `source ./bash_profile` to update the PATH changes
+- run `source ./bash_profile` to update the PATH changes
 
 - Change the VirtualHost configuration within the script to better match what is on your system
 
