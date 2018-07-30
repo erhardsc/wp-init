@@ -54,6 +54,8 @@ echo -e "\nUpdating Apache ${RED}httpd-vhosts${NC} and ${RED}/etc/hosts${NC} fil
 
 echo -e "\n${RED}URL:${NC} https://$1/"
 echo -e "${RED}PATH:${NC} `pwd`"
+
+# Change the location of the SSL certificate to the path on your system
 echo "<VirtualHost *:443>
     SSLEngine On
     SSLCertificateFile /Users/sumnererhard/ssl/server.crt
