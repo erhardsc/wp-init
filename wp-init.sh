@@ -20,23 +20,23 @@ if [[ -z "$2" ]]
     exit 1
 fi
 
-#  # download WordPress
-# wp core download
-#
-# # Prompt user on wp-config.php settings
-# wp config create --prompt
-# 
-# # Create database
-# wp db create
-#
-# # Init WP Core
-# wp core install --url=https://$1/ --title=$2 --admin_user=erhardsc --admin_password=Password1 --admin_email=develop@sumnererhard.com
-#
-# # Get rid of default themes
-# wp theme delete twentyseventeen twentysixteen twentyfifteen
-#
-# # Get rid of default plugins
-# wp plugin delete akismet hello
+ # download WordPress
+wp core download
+
+# Prompt user on wp-config.php settings
+wp config create --prompt
+
+# Create database
+wp db create
+
+# Init WP Core
+wp core install --url=https://$1/ --title=$2 --admin_user=erhardsc --admin_password=Password1 --admin_email=develop@sumnererhard.com
+
+# Get rid of default themes
+wp theme delete twentyseventeen twentysixteen twentyfifteen
+
+# Get rid of default plugins
+wp plugin delete akismet hello
 
 echo -e "\n${RED}Setup is not complete!${NC}"
 echo -e "\nMake sure you update your Apache ${RED}httpd-vhosts${NC} and ${RED}hosts${NC} file with the URL and PATH you specified"
