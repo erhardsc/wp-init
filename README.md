@@ -1,6 +1,14 @@
 # wp-init
 Create a WordPress install using the WP-CLI
 
+What this script does
+- Downloads WP Core
+- Prompts user on wp-config.php settings
+- Creates database based on settings in wp-config
+- Installs WP Core
+- Deletes default themes
+- Deletes default plugins
+
 This script is intended for developers using MAMP
 
 # Setup
