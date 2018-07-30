@@ -1,0 +1,7 @@
+#!/bin/bash
+# Download Latest WP Core, create a wp-config.php file, create a database,
+# and initailize a new user for the WordPress install
+#
+# This script assumes that you already have WP-CLI installed
+#
+# Execute this script inside the directory you want a WordPress install in
