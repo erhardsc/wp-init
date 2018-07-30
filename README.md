@@ -8,6 +8,8 @@ What this script does
 - Installs WP Core
 - Deletes default themes
 - Deletes default plugins
+- Updates MAMP Apache httpd-vhosts.conf file with a new Virtual host
+- Updates your system /etc/hosts file
 
 This script is intended for developers using MAMP
 
@@ -16,19 +18,20 @@ This script is intended for developers using MAMP
 This script assumes you already have WP-CLI installed
 https://wp-cli.org/
 
-Add the path to your MAMP PHP Version to your ~/.bash_profile
+ - Add the path to your MAMP PHP Version to your ~/.bash_profile
 https://laurenpittenger.com/wpcli-error-establishing-database-connection-mamp/
 
 `export MAMP_PATH=/Applications/MAMP/bin/php/php7.1.12/bin`
 
 `export PATH="$MAMP_PATH:$PATH/Applications/MAMP/Library/bin"`
 
-Add the path of your script to your ~/.bash_profile to make the script globally executable
-I generally keep mine in /Users/{user}/scripts/
+ - Add the path of your script to your ~/.bash_profile to make the script globally executable. I generally keep mine in /Users/{user}/scripts/
 
 `export PATH=$PATH:/appropriate/directory`
 
 run `source ./bash_profile` to update the PATH changes
+
+- Change the VirtualHost configuration within the script to better match what is on your system
 
 # Usage
 
