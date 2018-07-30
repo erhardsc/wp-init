@@ -6,6 +6,7 @@ This script is intended for developers using MAMP
 Add the path to your MAMP PHP Version to your ~/.bash_profile
 
 `export MAMP_PATH=/Applications/MAMP/bin/php/php7.1.12/bin`
+
 `export PATH="$MAMP_PATH:$PATH/Applications/MAMP/Library/bin"`
 
 Add the path of your script to your ~/.bash_profile to make the script globally executable
