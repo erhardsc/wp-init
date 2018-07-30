@@ -11,9 +11,9 @@ What this script does
 - Updates MAMP Apache httpd-vhosts.conf file with a new Virtual host
 - Updates your system /etc/hosts file
 
-This script is intended for developers using MAMP
+This script is intended for developers using MAMP or Vagrant
 
-# Setup
+# Setup - MAMP
 
 This script assumes you already have WP-CLI installed
 https://wp-cli.org/
@@ -33,7 +33,7 @@ https://laurenpittenger.com/wpcli-error-establishing-database-connection-mamp/
 
 - Change the VirtualHost configuration within the script to better match what is on your system
 
-# Usage
+# Usage - MAMP
 
 Make a directory for which you want WordPress installed
 
@@ -45,3 +45,14 @@ Run this command inside the directory you just made
 
 When prompted for the dbhost, specify 127.0.0.1 instead of localhost
 https://wordpress.stackexchange.com/questions/235483/mamp-pro-wp-cli-error-error-establishing-a-database-connection
+
+# Usage - Vagrant
+
+Navigate to the vagrant folder on your local machine
+Make a directory for which you want WordPress installed
+
+`mkdir {dir}`
+
+Run this command inside the directory you just made
+
+`wp-init {SITE URL} {SITE TITLE} {USERNAME} {ADMIN EMAIL}`

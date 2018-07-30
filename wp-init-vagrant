@@ -5,3 +5,61 @@
 # This script assumes that you already have WP-CLI installed
 #
 # Execute this script inside the directory you want a WordPress install in
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+if [[ -z "$1" ]]
+  then
+    echo -e "${RED}Usage${NC}: Please supply the local SITE URL in the first parameter"
+    exit 1
+fi
+
+if [[ -z "$2" ]]
+  then
+    echo -e "${RED}Usage${NC}: Please supply the SITE TITLE in the second parameter"
+    exit 1
+fi
+
+if [[ -z "$3" ]]
+  then
+    echo -e "${RED}Usage${NC}: Please supply the USERNAME in the third parameter"
+    exit 1
+fi
+
+if [[ -z "$4" ]]
+  then
+    echo -e "${RED}Usage${NC}: Please supply the ADMIN EMAIL in the forth parameter"
+    exit 1
+fi
+
+# download WordPress
+wp core download --ssh=vagrant@192.168.33.10 --path=/vagrant/sites/$2
+
+echo -e "\n${BLUE}Need to SSH in again to create wp-config.php file${NC}"
+# Prompt user on wp-config.php settings
+wp config create --ssh=vagrant@192.168.33.10 --path=/vagrant/sites/$2 --dbname=$2_vagrant --dbuser=root --dbhost=127.0.0.1
+
+echo -e "\n${BLUE}Need to SSH in again for DB commands${NC}"
+# Create database
+wp db create --ssh=vagrant@192.168.33.10 --path=/vagrant/sites/$2
+
+# Init WP Core
+wp core install --url=http://$1/ --title=$2 --admin_user=$3 --admin_password=Password1 --admin_email=$4 --ssh=vagrant@192.168.33.10 --path=/vagrant/sites/$2
+
+# Get rid of default themes
+wp theme delete twentyseventeen twentysixteen twentyfifteen --ssh=vagrant@192.168.33.10 --path=/vagrant/sites/$2
+
+# Get rid of default plugins
+wp plugin delete akismet hello --ssh=vagrant@192.168.33.10 --path=/vagrant/sites/$2
+
+echo -e "\n${GREEN}WordPress Login:${NC}"
+echo -e "\n${RED}USERNAME:${NC} $3"
+echo -e "\n${RED}PASS:${NC} Password1"
+
+echo -e "\n${GREEN}Site:${NC}"
+echo -e "\n${RED}URL:${NC} https://$1/"
+echo -e "${RED}PATH:${NC} /vagrant/sites/$2"
+
+echo -e "\nNeed to up Apache ${RED}httpd-vhosts${NC} and ${RED}/etc/hosts${NC} file with the URL and PATH you specified"
