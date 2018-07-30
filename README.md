@@ -38,7 +38,7 @@ Make a directory for which you want WordPress installed
 
 Run this command inside the directory you just made
 
-`wp-init.sh {SITE URL} {SITE TITLE}`
+`wp-init.sh {SITE URL} {SITE TITLE} {USERNAME} {ADMIN EMAIL}`
 
 When prompted for the dbhost, specify 127.0.0.1 instead of localhost
 https://wordpress.stackexchange.com/questions/235483/mamp-pro-wp-cli-error-error-establishing-a-database-connection
