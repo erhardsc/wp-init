@@ -20,6 +20,18 @@ if [[ -z "$2" ]]
     exit 1
 fi
 
+if [[ -z "$3" ]]
+  then
+    echo "Please supply the USERNAME in the third parameter"
+    exit 1
+fi
+
+if [[ -z "$4" ]]
+  then
+    echo "Please supply the ADMIN EMAIL in the forth parameter"
+    exit 1
+fi
+
  # download WordPress
 wp core download
 
@@ -30,7 +42,7 @@ wp config create --prompt
 wp db create
 
 # Init WP Core
-wp core install --url=https://$1/ --title=$2 --admin_user=erhardsc --admin_password=Password1 --admin_email=develop@sumnererhard.com
+wp core install --url=https://$1/ --title=$2 --admin_user=$3 --admin_password=Password1 --admin_email=$4
 
 # Get rid of default themes
 wp theme delete twentyseventeen twentysixteen twentyfifteen
