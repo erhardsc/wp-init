@@ -48,6 +48,12 @@ https://wordpress.stackexchange.com/questions/235483/mamp-pro-wp-cli-error-error
 
 # Setup - Vagrant
 
+ - Add the path of your script to your ~/.bash_profile to make the script globally executable. I generally keep mine in /Users/{user}/scripts/
+
+`export PATH=$PATH:/appropriate/directory`
+
+- run `source ./bash_profile` to update the PATH changes
+
 - Set synced_folder ownership to it's default (vagrant) in the VagrantFile
 
 `config.vm.synced_folder ".", "/vagrant/sites"`
