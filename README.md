@@ -41,7 +41,11 @@ Make a directory for which you want WordPress installed
 
 Run this command inside the directory you just made
 
-`wp-init {SITE URL} {SITE TITLE} {USERNAME} {ADMIN EMAIL}`
+`wp-init-mamp {SITE URL} {SITE TITLE} {USERNAME} {ADMIN EMAIL}`
+
+EX:
+
+`wp-init-mamp example.test Example username username@example.com`
 
 When prompted for the dbhost, specify 127.0.0.1 instead of localhost
 https://wordpress.stackexchange.com/questions/235483/mamp-pro-wp-cli-error-error-establishing-a-database-connection
