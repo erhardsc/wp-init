@@ -42,7 +42,6 @@ echo -e "site title : $_site_title"
 echo -e "username   : $_username"
 echo -e "email      : $_admin_email"
 
-
 die 'end of current completion'
 
  # download WordPress
@@ -55,7 +54,7 @@ wp config create --prompt
 wp db create
 
 # Init WP Core
-wp core install --url=https://$1/ --title=$2 --admin_user=$3 --admin_password=Password1 --admin_email=$4
+wp core install --url=https://$_site_url/ --title=$_site_title --admin_user=$_username --admin_password=Password1 --admin_email=$_admin_email
 
 # Get rid of default themes
 wp theme delete twentyseventeen twentysixteen twentyfifteen
@@ -64,7 +63,7 @@ wp theme delete twentyseventeen twentysixteen twentyfifteen
 wp plugin delete akismet hello
 echo -e "\nUpdating Apache ${RED}httpd-vhosts${NC} and ${RED}/etc/hosts${NC} file with the URL and PATH you specified"
 
-echo -e "\n${RED}URL:${NC} https://$1/"
+echo -e "\n${RED}URL:${NC} https://$_site_url/"
 echo -e "${RED}PATH:${NC} `pwd`"
 
 # Change the location of the SSL certificate to the path on your system
@@ -75,17 +74,17 @@ echo "<VirtualHost *:443>
 
     ServerAdmin localhost
     DocumentRoot "\"`pwd`\""
-    ServerName "\"$1"\"
-    ErrorLog "\"/Applications/MAMP/logs/$2-error_log"\"
+    ServerName "\"$_site_url"\"
+    ErrorLog "\"/Applications/MAMP/logs/$_site_title-error_log"\"
 </VirtualHost>" >> /Applications/MAMP/conf/apache/extra/httpd-vhosts.conf
 echo -e "\n${GREEN}Complete${NC} httpd-vhosts.conf file updated"
 
 echo -e "\nPlease enter your password in order to update your /etc/hosts file"
-echo "127.0.0.1   $1" | sudo tee -a /etc/hosts >> /dev/null
+echo "127.0.0.1   $_site_url" | sudo tee -a /etc/hosts >> /dev/null
 echo -e "\n${GREEN}Complete${NC}: /etc/host file updated"
 
 echo -e "\n${GREEN}Install Complete${NC}"
-echo -e "\n${RED}USERNAME:${NC} $3"
+echo -e "\n${RED}USERNAME:${NC} $_username"
 echo -e "\n${RED}PASS:${NC} Password1"
 
 echo -e "\nManaully restart MAMP"
