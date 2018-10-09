@@ -5,13 +5,15 @@
 # This script assumes that you already have WP-CLI installed
 #
 # Execute this script inside the directory you want a WordPress install in
+
 USAGE() {
-    echo "Usage:"
+    echo -e "Usage: ${GREEN}$PROGRAM www.mysite.com mysite JohnDoe jd@fakeemail.com${NC}"
     echo -e "Parameter 1: Please supply the local ${GREEN}SITE URL${NC}"
     echo -e "Parameter 2: Please supply the local ${GREEN}SITE TITLE${NC}"
     echo -e "Parameter 3: Please supply the local ${GREEN}USERNAME${NC}"
     echo -e "Parameter 4: Please supply the local ${GREEN}ADMIN EMAIL${NC}"
-    echo -e "\n${GREEN}example: $PROGRAM www.mysite.com mysite JohnDoe jd@fakeemail.com${NC}"
+    echo "If you have not already, install the WP-CLI command line tool."
+    echo "Then execute this script inside the directory you want WordPress installed in."
     exit 1
 }
 
@@ -21,49 +23,27 @@ die() {
     exit 1
 }
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-NC='\033[0m' # No Color
-typeset -r PROGRAM=${0##*/} #basename of program
+declare -r RED='\033[0;31m'
+declare -r GREEN='\033[0;32m'
+declare -r NC='\033[0m' # No Color
+declare -r PROGRAM=${0##*/} #basename of program
 
 if [[ $# -ne 4 ]]; then
     USAGE
 fi
 
-_site_url=$1
-_site_title=$2
-_username=$3
-_admin_email=$4
+declare -r _site_url=$1
+declare -r _site_title=$2
+declare -r _username=$3
+declare -r _admin_email=$4
 
 echo -e "site url   : $_site_url"
 echo -e "site title : $_site_title"
 echo -e "username   : $_username"
-echo -e "email      : $_email"
+echo -e "email      : $_admin_email"
+
 
 die 'end of current completion'
-#if [[ -z "$1" ]]
-  #then
-    #echo -e "${RED}Usage${NC}: Please supply the local SITE URL in the first parameter"
-    #exit 1
-#fi
-
-#if [[ -z "$2" ]]
-  #then
-    #echo -e "${RED}Usage${NC}: Please supply the SITE TITLE in the second parameter"
-    #exit 1
-#fi
-
-#if [[ -z "$3" ]]
-  #then
-    #echo -e "${RED}Usage${NC}: Please supply the USERNAME in the third parameter"
-    #exit 1
-#fi
-
-#if [[ -z "$4" ]]
-  #then
-    #echo -e "${RED}Usage${NC}: Please supply the ADMIN EMAIL in the forth parameter"
-    #exit 1
-#fi
 
  # download WordPress
 wp core download
