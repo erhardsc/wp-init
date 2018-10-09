@@ -37,12 +37,12 @@ declare -r _site_title=$2
 declare -r _username=$3
 declare -r _admin_email=$4
 
-echo -e "site url   : $_site_url"
-echo -e "site title : $_site_title"
-echo -e "username   : $_username"
-echo -e "email      : $_admin_email"
+#echo -e "site url   : $_site_url"
+#echo -e "site title : $_site_title"
+#echo -e "username   : $_username"
+#echo -e "email      : $_admin_email"
 
-die 'end of current completion'
+#die 'end of current completion'
 
  # download WordPress
 wp core download
