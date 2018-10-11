@@ -7,7 +7,7 @@
 # Execute this script inside the directory you want a WordPress install in
 
 USAGE() {
-    echo -e "Usage: ${GREEN}$PROGRAM www.mysite.com mysite JohnDoe jd@fakeemail.com${NC}"
+    echo -e "Usage: ${GREEN}$PROGRAM domainName.test mysite JohnDoe jd@fakeemail.com${NC}"
     echo -e "Parameter 1: Please supply the local ${GREEN}SITE URL${NC}"
     echo -e "Parameter 2: Please supply the local ${GREEN}SITE TITLE${NC}"
     echo -e "Parameter 3: Please supply the local ${GREEN}USERNAME${NC}"
