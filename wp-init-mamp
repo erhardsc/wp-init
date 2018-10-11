@@ -39,14 +39,12 @@ declare -r _admin_email=$4
 
 # Check for the WP-CLI and PH
 which php > /dev/null
-if [[ $? -eq 1 ]]
-then
+if [[ $? -eq 1 ]]; then
     die "${RED}$PROGRAM ERROR:${NC}\nThe WP-CLI is not installed.\nPlease visit ${GREEN}https://wp-cli.org/${NC} for instructions on how to install."
 fi
 
 which wp > /dev/null
-if [[ $? -eq 1 ]]
-then
+if [[ $? -eq 1 ]]; then
     die "${RED}$PROGRAM ERROR:${NC}\nPHP is not installed.\nPlease visit ${GREEN}http://php.net/manual/en/install.php${NC} for instructions on how to install."
 fi
 
