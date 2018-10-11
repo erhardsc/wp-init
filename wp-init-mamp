@@ -19,7 +19,7 @@ USAGE() {
 
 # Emit a message to stderr and exit.
 die() {
-    echo "$@" >&2
+    echo -e "$@" >&2
     exit 1
 }
 
@@ -37,14 +37,20 @@ declare -r _site_title=$2
 declare -r _username=$3
 declare -r _admin_email=$4
 
-#echo -e "site url   : $_site_url"
-#echo -e "site title : $_site_title"
-#echo -e "username   : $_username"
-#echo -e "email      : $_admin_email"
+# Check for the WP-CLI and PH
+which php > /dev/null
+if [[ $? -eq 1 ]]
+then
+    die "${RED}$PROGRAM ERROR:${NC}\nThe WP-CLI is not installed.\nPlease visit ${GREEN}https://wp-cli.org/${NC} for instructions on how to install."
+fi
 
-#die 'end of current completion'
+which wp > /dev/null
+if [[ $? -eq 1 ]]
+then
+    die "${RED}$PROGRAM ERROR:${NC}\nPHP is not installed.\nPlease visit ${GREEN}http://php.net/manual/en/install.php${NC} for instructions on how to install."
+fi
 
- # download WordPress
+# download WordPress
 wp core download
 
 # Prompt user on wp-config.php settings
