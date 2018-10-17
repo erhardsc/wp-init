@@ -5,35 +5,50 @@
 # This script assumes that you already have WP-CLI installed
 #
 # Execute this script inside the directory you want a WordPress install in
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-NC='\033[0m' # No Color
 
-if [[ -z "$1" ]]
-  then
-    echo -e "${RED}Usage${NC}: Please supply the local SITE URL in the first parameter"
+USAGE() {
+    echo -e "Usage: ${GREEN}$PROGRAM domainName.test mysite JohnDoe jd@fakeemail.com${NC}"
+    echo -e "Parameter 1: Please supply the local ${GREEN}SITE URL${NC}"
+    echo -e "Parameter 2: Please supply the local ${GREEN}SITE TITLE${NC}"
+    echo -e "Parameter 3: Please supply the local ${GREEN}USERNAME${NC}"
+    echo -e "Parameter 4: Please supply the local ${GREEN}ADMIN EMAIL${NC}"
+    echo "If you have not already, install the WP-CLI command line tool."
+    echo "Then execute this script inside the directory you want WordPress installed in."
     exit 1
+}
+
+# Emit a message to stderr and exit.
+die() {
+    echo -e "$@" >&2
+    exit 1
+}
+
+declare -r RED='\033[0;31m'
+declare -r GREEN='\033[0;32m'
+declare -r NC='\033[0m' # No Color
+declare -r PROGRAM=${0##*/} #basename of program
+
+if [[ $# -ne 4 ]]; then
+    USAGE
 fi
 
-if [[ -z "$2" ]]
-  then
-    echo -e "${RED}Usage${NC}: Please supply the SITE TITLE in the second parameter"
-    exit 1
+declare -r _site_url=$1
+declare -r _site_title=$2
+declare -r _username=$3
+declare -r _admin_email=$4
+
+# Check for the WP-CLI and PH
+which php > /dev/null
+if [[ $? -eq 1 ]]; then
+    die "${RED}$PROGRAM ERROR:${NC}\nThe WP-CLI is not installed.\nPlease visit ${GREEN}https://wp-cli.org/${NC} for instructions on how to install."
 fi
 
-if [[ -z "$3" ]]
-  then
-    echo -e "${RED}Usage${NC}: Please supply the USERNAME in the third parameter"
-    exit 1
+which wp > /dev/null
+if [[ $? -eq 1 ]]; then
+    die "${RED}$PROGRAM ERROR:${NC}\nPHP is not installed.\nPlease visit ${GREEN}http://php.net/manual/en/install.php${NC} for instructions on how to install."
 fi
 
-if [[ -z "$4" ]]
-  then
-    echo -e "${RED}Usage${NC}: Please supply the ADMIN EMAIL in the forth parameter"
-    exit 1
-fi
-
- # download WordPress
+# download WordPress
 wp core download
 
 # Prompt user on wp-config.php settings
@@ -43,7 +58,7 @@ wp config create --prompt
 wp db create
 
 # Init WP Core
-wp core install --url=https://$1/ --title=$2 --admin_user=$3 --admin_password=Password1 --admin_email=$4
+wp core install --url=https://$_site_url/ --title=$_site_title --admin_user=$_username --admin_password=Password1 --admin_email=$_admin_email
 
 # Get rid of default themes
 wp theme delete twentyseventeen twentysixteen twentyfifteen
@@ -52,28 +67,24 @@ wp theme delete twentyseventeen twentysixteen twentyfifteen
 wp plugin delete akismet hello
 echo -e "\nUpdating Apache ${RED}httpd-vhosts${NC} and ${RED}/etc/hosts${NC} file with the URL and PATH you specified"
 
-echo -e "\n${RED}URL:${NC} https://$1/"
+echo -e "\n${RED}URL:${NC} https://$_site_url/"
 echo -e "${RED}PATH:${NC} `pwd`"
 
 # Change the location of the SSL certificate to the path on your system
-echo "<VirtualHost *:443>
-    SSLEngine On
-    SSLCertificateFile /Users/sumnererhard/ssl/server.crt
-    SSLCertificateKeyFile /Users/sumnererhard/ssl/server.key
-
+echo "<VirtualHost $_site_url:80>
     ServerAdmin localhost
     DocumentRoot "\"`pwd`\""
-    ServerName "\"$1"\"
-    ErrorLog "\"/Applications/MAMP/logs/$2-error_log"\"
+    ServerName "\"$_site_url"\"
+    ErrorLog "\"/Applications/MAMP/logs/$_site_title-error_log"\"
 </VirtualHost>" >> /Applications/MAMP/conf/apache/extra/httpd-vhosts.conf
 echo -e "\n${GREEN}Complete${NC} httpd-vhosts.conf file updated"
 
 echo -e "\nPlease enter your password in order to update your /etc/hosts file"
-echo "127.0.0.1   $1" | sudo tee -a /etc/hosts >> /dev/null
+echo "127.0.0.1   $_site_url" | sudo tee -a /etc/hosts >> /dev/null
 echo -e "\n${GREEN}Complete${NC}: /etc/host file updated"
 
 echo -e "\n${GREEN}Install Complete${NC}"
-echo -e "\n${RED}USERNAME:${NC} $3"
+echo -e "\n${RED}USERNAME:${NC} $_username"
 echo -e "\n${RED}PASS:${NC} Password1"
 
 echo -e "\nManaully restart MAMP"
