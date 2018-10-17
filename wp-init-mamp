@@ -71,11 +71,7 @@ echo -e "\n${RED}URL:${NC} https://$_site_url/"
 echo -e "${RED}PATH:${NC} `pwd`"
 
 # Change the location of the SSL certificate to the path on your system
-echo "<VirtualHost *:443>
-    SSLEngine On
-    SSLCertificateFile /Users/sumnererhard/ssl/server.crt
-    SSLCertificateKeyFile /Users/sumnererhard/ssl/server.key
-
+echo "<VirtualHost *:80>
     ServerAdmin localhost
     DocumentRoot "\"`pwd`\""
     ServerName "\"$_site_url"\"
