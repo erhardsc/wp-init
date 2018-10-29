@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Delete Default plugins
+wp plugin delete hello
+
+# Install Plugins
+wp plugin install autover autoptimize query-monitor redirection woocommerce woocommerce-services wp-gdpr-compliance wp-migrate-db wp-maintenance-mode woo-preview-emails genesis-connect-woocommerce wordpress-seo wordfence woocommerce-gateway-stripe
+
+# Delete default themes
+wp theme delete twentyseventeen twentysixteen twentyfifteen
