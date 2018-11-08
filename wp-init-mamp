@@ -156,6 +156,9 @@ wp post delete $(wp post list --post_status=trash --format=ids)
 
 wp post create --post_type=page --post_title='_Front Page' --post_status=publish
 
+wp option update show_on_front page
+wp option update page_on_front $(wp post list --pagename=_front-page --field=ID --path=$(CONFIG DOCUMENT_ROOT)$_site_title --url=$_site_url)
+
 wp menu create "Primary Naviagtion"
 wp menu location assign primary-naviagtion primary
 wp menu create "Secondary Naviagtion"
