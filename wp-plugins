@@ -1,0 +1,26 @@
+#!/bin/bash
+
+# Delete Default plugins
+wp plugin delete hello
+
+cd /wp-content/plugins
+
+cp -a ~/Dropbox/install-script/plugins .
+
+# Install Plugins
+# wp plugin install autover autoptimize query-monitor redirection woocommerce woocommerce-services wp-gdpr-compliance wp-migrate-db wp-maintenance-mode woo-preview-emails genesis-connect-woocommerce wordpress-seo wordfence woocommerce-gateway-stripe
+#
+# wp plugin install ~/Dropbox/install-script/plugins
+#
+# wp plugin update --all
+#
+# # Delete default themes
+# wp theme delete twentyseventeen twentysixteen twentyfifteen
+#
+# # Delete all pages
+# wp post delete $(wp post list --post_type='page' --format=ids)
+#
+# # Delete all Trashed pages
+# wp post delete $(wp post list --post_status=trash --format=ids)
+#
+# wp post create --post_type=page --post_title='_Front Page'

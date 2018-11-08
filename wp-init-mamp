@@ -6,6 +6,46 @@
 #
 # Execute this script inside the directory you want a WordPress install in
 
+# Pull any custom configurations
+CONFIG() {
+    val=$(grep -E "^$1=" ~/scripts/wp-init/wp-init.conf 2>/dev/null || echo "$1=__DEFAULT__" | head -n 1 | cut -d '=' -f 2-)
+
+    if [[ $val == __DEFAULT__ ]]
+    then
+        case $1 in
+            MYSQL_USER)
+                echo -n "root"
+                ;;
+            MYSQL_PASS)
+                echo -n "root"
+                ;;
+            HOSTNAME)
+                echo -n "127.0.0.1"
+                ;;
+            DOCUMENT_ROOT)
+                echo -n "~/Sites/"
+                ;;
+            DROPBOX_PATH)
+                echo -n "~/Dropbox/"
+                ;;
+            SSL)
+                echo -n "false"
+                ;;
+            SERVER)
+                echo -n "MAMP"
+                ;;
+            APACHE_LOGS_PATH)
+                echo -n "/Applications/MAMP/logs/"
+                ;;
+            APACHE_VHOSTS_PATH)
+                echo -n "/Applications/MAMP/conf/apache/extra/httpd-vhosts.conf"
+                ;;
+        esac
+    else
+        echo -n $val | cut -d '=' -f 2-
+    fi
+}
+
 USAGE() {
     echo -e "Usage: ${GREEN}$PROGRAM domainName.test mysite JohnDoe jd@fakeemail.com${NC}"
     echo -e "Parameter 1: Please supply the local ${GREEN}SITE URL${NC}"
@@ -37,7 +77,17 @@ declare -r _site_title=$2
 declare -r _username=$3
 declare -r _admin_email=$4
 
-# Check for the WP-CLI and PH
+# Declare constants
+
+if [[ $(CONFIG SSL) = true ]]; then
+  echo "Using HTTPS"
+  declare -r secure_site_url=https://$_site_url
+else
+  echo "Using HTTP"
+  declare -r unsecure_site_url=http://$_site_url
+fi
+
+# Check for the WP-CLI and PHP
 which php > /dev/null
 if [[ $? -eq 1 ]]; then
     die "${RED}$PROGRAM ERROR:${NC}\nThe WP-CLI is not installed.\nPlease visit ${GREEN}https://wp-cli.org/${NC} for instructions on how to install."
@@ -48,35 +98,101 @@ if [[ $? -eq 1 ]]; then
     die "${RED}$PROGRAM ERROR:${NC}\nPHP is not installed.\nPlease visit ${GREEN}http://php.net/manual/en/install.php${NC} for instructions on how to install."
 fi
 
+cd $(CONFIG DOCUMENT_ROOT)
+
+mkdir $_site_title
+
+cd $_site_title
+
 # download WordPress
 wp core download
 
 # Prompt user on wp-config.php settings
-wp config create --prompt
+wp config create --dbname=wp_$_site_title --dbuser=$(CONFIG MYSQL_USER) --dbpass=$(CONFIG MYSQL_PASS) --dbhost=$(CONFIG HOSTNAME) --dbcharset=utf8mb4
 
 # Create database
 wp db create
 
 # Init WP Core
-wp core install --url=https://$_site_url/ --title=$_site_title --admin_user=$_username --admin_password=Password1 --admin_email=$_admin_email
-
-# Get rid of default themes
-wp theme delete twentyseventeen twentysixteen twentyfifteen
+wp core install --url=$_site_url/ --title=$_site_title --admin_user=$_username --admin_password=Password1 --admin_email=$_admin_email
 
 # Get rid of default plugins
-wp plugin delete akismet hello
+wp plugin delete hello
+
+cd $(CONFIG DOCUMENT_ROOT)$_site_title/wp-content/plugins
+
+cp -a $(CONFIG DROPBOX_PATH)/install-script/plugins/* .
+
+wp plugin install autover autoptimize query-monitor redirection woocommerce woocommerce-services wp-gdpr-compliance wp-migrate-db wp-maintenance-mode woo-preview-emails genesis-connect-woocommerce wordpress-seo wordfence woocommerce-gateway-stripe
+
+# update all plugins
+wp plugin update --all
+
+# activate all plugins
+wp plugin activate --all
+
+cd $(CONFIG DOCUMENT_ROOT)$_site_title
+
+# Get rid of default themes
+wp theme delete twentysixteen twentyfifteen
+
+cd $(CONFIG DOCUMENT_ROOT)$_site_title/wp-content/themes
+
+cp -a $(CONFIG DROPBOX_PATH)/install-script/themes/* .
+
+wp theme update genesis
+
+cd $(CONFIG DOCUMENT_ROOT)$_site_title/wp-content/themes/virtuoso
+
+# Need to install all Virtuoso dependencies
+npm install && composer install
+
+wp theme activate virtuoso
+
+# Delete all pages
+wp post delete $(wp post list --post_type='page' --format=ids)
+# Delete all Trashed pages
+wp post delete $(wp post list --post_status=trash --format=ids)
+
+wp post create --post_type=page --post_title='_Front Page' --post_status=publish
+
+wp menu create "Primary Naviagtion"
+wp menu location assign primary-naviagtion primary
+wp menu create "Secondary Naviagtion"
+wp menu location assign secondary-naviagtion secondary
+
+wp rewrite structure '/%postname%'
+
 echo -e "\nUpdating Apache ${RED}httpd-vhosts${NC} and ${RED}/etc/hosts${NC} file with the URL and PATH you specified"
 
-echo -e "\n${RED}URL:${NC} https://$_site_url/"
-echo -e "${RED}PATH:${NC} `pwd`"
+if [[ $(CONFIG SSL) = true ]]; then
+  echo -e "\n${RED}URL:${NC} $secure_site_url/"
+else
+  echo -e "\n${RED}URL:${NC} $unsecure_site_url/"
+fi
+echo -e "${RED}PATH:${NC} "\"$(CONFIG DOCUMENT_ROOT)$_site_title"\""
 
 # Change the location of the SSL certificate to the path on your system
-echo "<VirtualHost $_site_url:80>
-    ServerAdmin localhost
-    DocumentRoot "\"`pwd`\""
-    ServerName "\"$_site_url"\"
-    ErrorLog "\"/Applications/MAMP/logs/$_site_title-error_log"\"
-</VirtualHost>" >> /Applications/MAMP/conf/apache/extra/httpd-vhosts.conf
+if [[ $(CONFIG SSL) = true ]]; then
+  echo "<VirtualHost *:443>
+      SSLEngine On
+      SSLCertificateFile "\"$(CONFIG SSLCertificateFile)"\"
+      SSLCertificateKeyFile "\"$(CONFIG SSLCertificateKeyFile)"\"
+
+      ServerAdmin localhost
+      DocumentRoot "\"$(CONFIG DOCUMENT_ROOT)$_site_title"\"
+      ServerName "\"$_site_url"\"
+      ErrorLog "\"$(CONFIG APACHE_LOGS_PATH)$_site_title-error_log"\"
+  </VirtualHost>" >> $(CONFIG APACHE_VHOSTS_PATH)
+else
+  echo "<VirtualHost $_site_url:80>
+      ServerAdmin localhost
+      DocumentRoot "\"$(CONFIG DOCUMENT_ROOT)$_site_title"\"
+      ServerName "\"$_site_url"\"
+      ErrorLog "\"$(CONFIG APACHE_LOGS_PATH)$_site_title-error_log"\"
+  </VirtualHost>" >> $(CONFIG APACHE_VHOSTS_PATH)
+fi
+
 echo -e "\n${GREEN}Complete${NC} httpd-vhosts.conf file updated"
 
 echo -e "\nPlease enter your password in order to update your /etc/hosts file"
@@ -87,4 +203,4 @@ echo -e "\n${GREEN}Install Complete${NC}"
 echo -e "\n${RED}USERNAME:${NC} $_username"
 echo -e "\n${RED}PASS:${NC} Password1"
 
-echo -e "\nManaully restart MAMP"
+echo -e "\nAll Done! Now please restart MAMP or which ever webserver you're using"
