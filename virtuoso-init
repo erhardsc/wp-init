@@ -1,0 +1,131 @@
+#! /bin/bash
+# Just sets up the plugins and theme for a Virtuoso build
+# This script does not do anything with the database or web server
+#
+#
+# This script assumes that you already have WP-CLI installed
+#
+# Execute this script inside the directory you want a WordPress install in
+
+# Pull any custom configurations
+CONFIG() {
+    val=$(grep -E "^$1=" ~/scripts/wp-init/wp-init.conf 2>/dev/null || echo "$1=__DEFAULT__" | head -n 1 | cut -d '=' -f 2-)
+
+    if [[ $val == __DEFAULT__ ]]
+    then
+        case $1 in
+            DOCUMENT_ROOT)
+                echo -n "~/Sites/"
+                ;;
+            DROPBOX_PATH)
+                echo -n "~/Dropbox/"
+                ;;
+            SSL)
+                echo -n "false"
+                ;;
+            SERVER)
+                echo -n "MAMP"
+                ;;
+        esac
+    else
+        echo -n $val | cut -d '=' -f 2-
+    fi
+}
+
+USAGE() {
+    echo -e "Usage: ${GREEN}$PROGRAM domainName.test mysite${NC}"
+    echo -e "Parameter 1: Please supply the local ${GREEN}SITE URL${NC}"
+    echo -e "Parameter 2: Please supply the local ${GREEN}SITE TITLE${NC}"
+    echo "If you have not already, install the WP-CLI command line tool."
+    echo "Then execute this script inside the directory you want WordPress installed in."
+    exit 1
+}
+
+# Emit a message to stderr and exit.
+die() {
+    echo -e "$@" >&2
+    exit 1
+}
+
+declare -r RED='\033[0;31m'
+declare -r GREEN='\033[0;32m'
+declare -r NC='\033[0m' # No Color
+declare -r PROGRAM=${0##*/} #basename of program
+
+if [[ $# -ne 2 ]]; then
+    USAGE
+fi
+
+declare -r _site_url=$1
+declare -r _site_title=$2
+
+# Declare constants
+
+if [[ $(CONFIG SSL) = true ]]; then
+  echo "Using HTTPS"
+  declare -r secure_site_url=https://$_site_url
+else
+  echo "Using HTTP"
+  declare -r unsecure_site_url=http://$_site_url
+fi
+
+# Check for the WP-CLI and PHP
+which php > /dev/null
+if [[ $? -eq 1 ]]; then
+    die "${RED}$PROGRAM ERROR:${NC}\nThe WP-CLI is not installed.\nPlease visit ${GREEN}https://wp-cli.org/${NC} for instructions on how to install."
+fi
+
+which wp > /dev/null
+if [[ $? -eq 1 ]]; then
+    die "${RED}$PROGRAM ERROR:${NC}\nPHP is not installed.\nPlease visit ${GREEN}http://php.net/manual/en/install.php${NC} for instructions on how to install."
+fi
+
+cd $(CONFIG DOCUMENT_ROOT)$_site_title/wp-content/plugins
+
+# Get rid of default plugins
+wp plugin delete hello
+
+cp -a $(CONFIG DROPBOX_PATH)/install-script/plugins/* .
+
+wp plugin install autover autoptimize query-monitor redirection woocommerce woocommerce-services wp-gdpr-compliance wp-migrate-db wp-maintenance-mode woo-preview-emails genesis-connect-woocommerce wordpress-seo wordfence woocommerce-gateway-stripe
+
+# update all plugins
+wp plugin update --all
+
+# activate all plugins
+wp plugin activate --all
+
+cd $(CONFIG DOCUMENT_ROOT)$_site_title
+
+# Get rid of default themes
+wp theme delete twentysixteen twentyfifteen
+
+cd $(CONFIG DOCUMENT_ROOT)$_site_title/wp-content/themes
+
+cp -a $(CONFIG DROPBOX_PATH)/install-script/themes/* .
+
+wp theme update genesis
+
+cd $(CONFIG DOCUMENT_ROOT)$_site_title/wp-content/themes/virtuoso
+
+# Need to install all Virtuoso dependencies
+npm install && composer install
+
+wp theme activate virtuoso
+
+# Delete all pages
+wp post delete $(wp post list --post_type='page' --format=ids)
+# Delete all Trashed pages
+wp post delete $(wp post list --post_status=trash --format=ids)
+
+wp post create --post_type=page --post_title='_Front Page' --post_status=publish
+
+wp option update show_on_front page
+wp option update page_on_front $(wp post list --pagename=_front-page --field=ID --path=$(CONFIG DOCUMENT_ROOT)$_site_title --url=$_site_url)
+
+wp menu create "Primary Naviagtion"
+wp menu location assign primary-naviagtion primary
+wp menu create "Secondary Naviagtion"
+wp menu location assign secondary-naviagtion secondary
+
+wp rewrite structure '/%postname%'
