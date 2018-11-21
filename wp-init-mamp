@@ -123,13 +123,15 @@ cd $(CONFIG DOCUMENT_ROOT)$_site_title/wp-content/plugins
 
 cp -a $(CONFIG DROPBOX_PATH)/install-script/plugins/* .
 
-wp plugin install autover autoptimize query-monitor redirection woocommerce woocommerce-services wp-gdpr-compliance wp-migrate-db wp-maintenance-mode woo-preview-emails genesis-connect-woocommerce wordpress-seo wordfence woocommerce-gateway-stripe
+wp plugin install query-monitor ninja-forms imsanity
 
 # update all plugins
 wp plugin update --all
 
 # activate all plugins
 wp plugin activate --all
+
+wp plugin install woocommerce woocommerce-services wp-gdpr-compliance wp-migrate-db wp-maintenance-mode woo-preview-emails genesis-connect-woocommerce wordfence wordpress-seo woocommerce-gateway-stripe autoptimize autoptimize redirection autover
 
 cd $(CONFIG DOCUMENT_ROOT)$_site_title
 
