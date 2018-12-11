@@ -119,8 +119,15 @@ elif [[ "$(CONFIG SERVER)" = 'FLYWHEEL' ]]; then
   cd "$(CONFIG DOCUMENT_ROOT)"$_site_title/app/public/wp-content/themes/virtuoso
 fi
 
+# Stash the previous Viruoso install so we can grab the newest files
+git stash
+
+git pull
+
 # Need to install all Virtuoso dependencies
 npm install && composer install
+
+npm run dev
 
 wp theme activate virtuoso
 
