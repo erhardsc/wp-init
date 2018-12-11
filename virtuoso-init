@@ -71,21 +71,20 @@ if [[ $? -eq 1 ]]; then
 fi
 
 if [[ "$(CONFIG SERVER)" = "MAMP" ]]; then
-  wp core download --path=$(CONFIG DOCUMENT_ROOT)$_site_title/
-elif [[ $(CONFIG SERVER) = 'FYLWHEEL' ]]; then
-  wp core download --path=$(CONFIG DOCUMENT_ROOT)$_site_title/app/public/
+  wp core download --path="$(CONFIG DOCUMENT_ROOT)"$_site_title/
+elif [[ "$(CONFIG SERVER)" = 'FYLWHEEL' ]]; then
+  wp core download --path="$(CONFIG DOCUMENT_ROOT)"$_site_title/app/public/
 fi
 
-if [[ $(CONFIG SERVER) = 'MAMP' ]]; then
+if [[ "$(CONFIG SERVER)" = 'MAMP' ]]; then
   cd "$(CONFIG DOCUMENT_ROOT)"$_site_title/wp-content/plugins
-elif [[ $(CONFIG SERVER) = 'FYLWHEEL' ]]; then
+elif [[ "$(CONFIG SERVER)" = 'FYLWHEEL' ]]; then
   cd "$(CONFIG DOCUMENT_ROOT)"$_site_title/app/public/wp-content/plugins
 fi
 
+cp -a "$(CONFIG DROPBOX_PATH)"/install-script/plugins/* .
 
-cp -a $(CONFIG DROPBOX_PATH)/install-script/plugins/* .
-
-wp plugin install query-monitor ninja-forms imsanity
+wp plugin install query-monitor ninja-forms imsanity wp-migrate-db
 
 # update all plugins
 wp plugin update --all
@@ -93,20 +92,20 @@ wp plugin update --all
 # activate all plugins
 wp plugin activate --all
 
-wp plugin install woocommerce woocommerce-services wp-gdpr-compliance wp-migrate-db wp-maintenance-mode woo-preview-emails genesis-connect-woocommerce wordfence wordpress-seo woocommerce-gateway-stripe autoptimize autoptimize redirection autover
+wp plugin install woocommerce woocommerce-services wp-gdpr-compliance wp-maintenance-mode woo-preview-emails genesis-connect-woocommerce wordfence wordpress-seo woocommerce-gateway-stripe autoptimize redirection autover
 
-if [[ $(CONFIG SERVER) = 'MAMP' ]]; then
+if [[ "$(CONFIG SERVER)" = 'MAMP' ]]; then
   cd "$(CONFIG DOCUMENT_ROOT)"$_site_title
-elif [[ $(CONFIG SERVER) = 'FYLWHEEL' ]]; then
+elif [[ "$(CONFIG SERVER)" = 'FYLWHEEL' ]]; then
   cd "$(CONFIG DOCUMENT_ROOT)"$_site_title/app/public/
 fi
 
 # Get rid of default themes
 wp theme delete twentysixteen twentyfifteen
 
-if [[ $(CONFIG SERVER) = 'MAMP' ]]; then
+if [[ "$(CONFIG SERVER)" = 'MAMP' ]]; then
   cd "$(CONFIG DOCUMENT_ROOT)"$_site_title/wp-content/themes
-elif [[ $(CONFIG SERVER) = 'FLYWHEEL' ]]; then
+elif [[ "$(CONFIG SERVER)" = 'FLYWHEEL' ]]; then
   cd "$(CONFIG DOCUMENT_ROOT)"$_site_title/app/public/wp-content/themes
 fi
 
@@ -114,9 +113,9 @@ cp -a $(CONFIG DROPBOX_PATH)/install-script/themes/* .
 
 wp theme update genesis
 
-if [[ $(CONFIG SERVER) = 'MAMP' ]]; then
+if [[ "$(CONFIG SERVER)" = 'MAMP' ]]; then
   cd "$(CONFIG DOCUMENT_ROOT)"$_site_title/wp-content/themes/virtuoso
-elif [[ $(CONFIG SERVER) = 'FLYWHEEL' ]]; then
+elif [[ "$(CONFIG SERVER)" = 'FLYWHEEL' ]]; then
   cd "$(CONFIG DOCUMENT_ROOT)"$_site_title/app/public/wp-content/themes/virtuoso
 fi
 
@@ -134,10 +133,10 @@ wp post create --post_type=page --post_title='_Front Page' --post_status=publish
 
 wp option update show_on_front page
 
-if [[ $(CONFIG SERVER) = 'MAMP' ]]; then
-  wp option update page_on_front $(wp post list --pagename=_front-page --field=ID --path=$(CONFIG DOCUMENT_ROOT)$_site_title --url=$_site_url)
-elif [[ $(CONFIG SERVER) = 'FLYWHEEL' ]]; then
-  wp option update page_on_front $(wp post list --pagename=_front-page --field=ID --path=$(CONFIG DOCUMENT_ROOT)$_site_title/app/public --url=$_site_url)
+if [[ "$(CONFIG SERVER)" = 'MAMP' ]]; then
+  wp option update page_on_front $(wp post list --pagename=_front-page --field=ID --path="$(CONFIG DOCUMENT_ROOT)"$_site_title --url=$_site_url)
+elif [[ "$(CONFIG SERVER)" = 'FLYWHEEL' ]]; then
+  wp option update page_on_front $(wp post list --pagename=_front-page --field=ID --path="$(CONFIG DOCUMENT_ROOT)"$_site_title/app/public --url=$_site_url)
 fi
 
 wp menu create "Primary Naviagtion"
