@@ -101,7 +101,7 @@ install_plugins() {
   # Grab the newest viruoso-grandchild
   git init
 
-  git remote add origin https://github.com/ErhardLabs/virtuoso-grandchild.git
+  git remote add updstream https://github.com/ErhardLabs/virtuoso-grandchild.git
 
   git fetch --all
 
