@@ -70,87 +70,115 @@ if [[ $? -eq 1 ]]; then
     die "${RED}$PROGRAM ERROR:${NC}\nPHP is not installed.\nPlease visit ${GREEN}http://php.net/manual/en/install.php${NC} for instructions on how to install."
 fi
 
-if [[ "$(CONFIG SERVER)" = "MAMP" ]]; then
-  wp core download --path="$(CONFIG DOCUMENT_ROOT)"$_site_title/
-elif [[ "$(CONFIG SERVER)" = 'FYLWHEEL' ]]; then
-  wp core download --path="$(CONFIG DOCUMENT_ROOT)"$_site_title/app/public/
+# What server are we using? Set the wp-content path
+if [[ "$(CONFIG SERVER)" = 'FLYWHEEL' ]]; then
+  declare -r _wp_root_path="$(CONFIG DOCUMENT_ROOT)"$_site_title/app/public
 fi
 
 if [[ "$(CONFIG SERVER)" = 'MAMP' ]]; then
-  cd "$(CONFIG DOCUMENT_ROOT)"$_site_title/wp-content/plugins
-elif [[ "$(CONFIG SERVER)" = 'FYLWHEEL' ]]; then
-  cd "$(CONFIG DOCUMENT_ROOT)"$_site_title/app/public/wp-content/plugins
+  declare -r _wp_root_path="$(CONFIG DOCUMENT_ROOT)"$_site_title
+  wp config set DB_HOST "127.0.0.1"
 fi
 
-cp -a "$(CONFIG DROPBOX_PATH)"/install-script/plugins/* .
+install_plugins() {
 
-wp plugin install query-monitor ninja-forms imsanity wp-migrate-db
+  cd "$_wp_root_path"/wp-content/plugins
 
-# update all plugins
-wp plugin update --all
+  cp -a "$(CONFIG DROPBOX_PATH)"/install-script/plugins/* .
 
-# activate all plugins
-wp plugin activate --all
+  wp plugin install query-monitor ninja-forms imsanity wp-migrate-db
 
-wp plugin install woocommerce woocommerce-services wp-gdpr-compliance wp-maintenance-mode woo-preview-emails genesis-connect-woocommerce wordfence wordpress-seo woocommerce-gateway-stripe autoptimize redirection autover
+  unzip "$_wp_root_path"/wp-content/plugins/virtuoso-grandchild.zip
+  rm "$_wp_root_path"/wp-content/plugins/virtuoso-grandchild.zip
 
-if [[ "$(CONFIG SERVER)" = 'MAMP' ]]; then
-  cd "$(CONFIG DOCUMENT_ROOT)"$_site_title
-elif [[ "$(CONFIG SERVER)" = 'FYLWHEEL' ]]; then
-  cd "$(CONFIG DOCUMENT_ROOT)"$_site_title/app/public/
-fi
+  mv "$_wp_root_path"/wp-content/plugins/virtuoso-grandchild-master "$_wp_root_path"/wp-content/plugins/virtuoso-grandchild
 
-# Get rid of default themes
-wp theme delete twentysixteen twentyfifteen
+  unzip "$_wp_root_path"/wp-content/plugins/advanced-custom-fields-pro.zip
+  rm "$_wp_root_path"/wp-content/plugins/advanced-custom-fields-pro.zip
 
-if [[ "$(CONFIG SERVER)" = 'MAMP' ]]; then
-  cd "$(CONFIG DOCUMENT_ROOT)"$_site_title/wp-content/themes
-elif [[ "$(CONFIG SERVER)" = 'FLYWHEEL' ]]; then
-  cd "$(CONFIG DOCUMENT_ROOT)"$_site_title/app/public/wp-content/themes
-fi
+  cd "$_wp_root_path"/wp-content/plugins/virtuoso-grandchild
 
-cp -a $(CONFIG DROPBOX_PATH)/install-script/themes/* .
+  # Grab the newest viruoso-grandchild
+  git init
 
-wp theme update genesis
+  git remote add origin https://github.com/ErhardLabs/virtuoso-grandchild.git
 
-if [[ "$(CONFIG SERVER)" = 'MAMP' ]]; then
-  cd "$(CONFIG DOCUMENT_ROOT)"$_site_title/wp-content/themes/virtuoso
-elif [[ "$(CONFIG SERVER)" = 'FLYWHEEL' ]]; then
-  cd "$(CONFIG DOCUMENT_ROOT)"$_site_title/app/public/wp-content/themes/virtuoso
-fi
+  git fetch --all
 
-# Stash the previous Viruoso install so we can grab the newest files
-git stash
+  git reset --hard origin/master
 
-git pull
+  # update all plugins
+  wp plugin update --all
 
-# Need to install all Virtuoso dependencies
-npm install && composer install
+  # activate all plugins
+  wp plugin activate --all
 
-npm run dev
+  wp plugin install woocommerce woocommerce-services wp-gdpr-compliance wp-maintenance-mode woo-preview-emails genesis-connect-woocommerce wordfence wordpress-seo woocommerce-gateway-stripe autoptimize redirection autover
+}
 
-wp theme activate virtuoso
+install_themes() {
+  cd "$_wp_root_path"/wp-content/themes
 
-# Delete all pages
-wp post delete $(wp post list --post_type='page' --format=ids)
-# Delete all Trashed pages
-wp post delete $(wp post list --post_status=trash --format=ids)
+  cp -a "$(CONFIG DROPBOX_PATH)"/install-script/themes/* .
 
-wp post create --post_type=page --post_title='_Front Page' --post_status=publish
+  cd "$_wp_root_path"/wp-content/themes/virtuoso
 
-wp option update show_on_front page
+  # Grab the newest Viruoso install so we can grab the newest files
+  git init
 
-if [[ "$(CONFIG SERVER)" = 'MAMP' ]]; then
-  wp option update page_on_front $(wp post list --pagename=_front-page --field=ID --path="$(CONFIG DOCUMENT_ROOT)"$_site_title --url=$_site_url)
-elif [[ "$(CONFIG SERVER)" = 'FLYWHEEL' ]]; then
-  wp option update page_on_front $(wp post list --pagename=_front-page --field=ID --path="$(CONFIG DOCUMENT_ROOT)"$_site_title/app/public --url=$_site_url)
-fi
+  git remote add origin https://github.com/ErhardLabs/virtuoso.git
 
-wp menu create "Primary Naviagtion"
-wp menu location assign primary-naviagtion primary
-wp menu create "Secondary Naviagtion"
-wp menu location assign secondary-naviagtion secondary
+  git fetch --all
 
-wp rewrite structure '/%postname%'
+  git reset --hard origin/master
+
+  # Need to install all Virtuoso dependencies
+  npm install && composer install
+
+  npm run dev
+
+  wp theme update genesis
+
+  wp theme activate virtuoso
+
+  # Get rid of default themes
+  wp theme delete twentynineteen twentyseventeen twentysixteen twentyfifteen
+}
+
+delete_default_posts() {
+  # Delete all pages
+  wp post delete $(wp post list --post_type='page' --format=ids)
+  # Delete all Trashed pages
+  wp post delete $(wp post list --post_status=trash --format=ids)
+}
+
+create_front_page() {
+  wp post create --post_type=page --post_title='_Front Page' --post_status=publish
+  wp option update show_on_front page
+  wp option update page_on_front $(wp post list --pagename=_front-page --field=ID --path="$_wp_root_path" --url=$_site_url)
+}
+
+create_menus() {
+  wp menu create "Primary Naviagtion"
+  wp menu location assign primary-naviagtion primary
+  wp menu create "Secondary Naviagtion"
+  wp menu location assign secondary-naviagtion secondary
+}
+
+update_permalinks() {
+  wp rewrite structure '/%postname%'
+}
+
+MAIN() {
+  install_plugins
+  install_themes
+  delete_default_posts
+  create_front_page
+  create_menus
+  update_permalinks
+}
+
+MAIN
+die "${GREEN}$PROGRAM FINISHED!${NC}\n${_site_url} is now running"
 
 exit 1
