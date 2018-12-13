@@ -105,7 +105,7 @@ install_plugins() {
   # activate all plugins
   wp plugin activate --all
 
-  wp plugin install woocommerce woocommerce-services wp-gdpr-compliance wp-maintenance-mode woo-preview-emails genesis-connect-woocommerce wordfence wordpress-seo woocommerce-gateway-stripe autoptimize redirection autover
+  wp plugin install svg-support woocommerce woocommerce-services wp-gdpr-compliance wp-maintenance-mode woo-preview-emails genesis-connect-woocommerce wordfence wordpress-seo woocommerce-gateway-stripe autoptimize redirection autover
 }
 
 install_themes() {
