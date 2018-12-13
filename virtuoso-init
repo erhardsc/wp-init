@@ -88,24 +88,16 @@ install_plugins() {
 
   wp plugin install query-monitor ninja-forms imsanity wp-migrate-db
 
-  unzip "$_wp_root_path"/wp-content/plugins/virtuoso-grandchild.zip
-  rm "$_wp_root_path"/wp-content/plugins/virtuoso-grandchild.zip
-
-  mv "$_wp_root_path"/wp-content/plugins/virtuoso-grandchild-master "$_wp_root_path"/wp-content/plugins/virtuoso-grandchild
-
   unzip "$_wp_root_path"/wp-content/plugins/advanced-custom-fields-pro.zip
   rm "$_wp_root_path"/wp-content/plugins/advanced-custom-fields-pro.zip
 
+  git clone https://github.com/ErhardLabs/virtuoso-grandchild.git
+
   cd "$_wp_root_path"/wp-content/plugins/virtuoso-grandchild
-
   # Grab the newest viruoso-grandchild
-  git init
 
-  git remote add updstream https://github.com/ErhardLabs/virtuoso-grandchild.git
-
-  git fetch --all
-
-  git reset --hard origin/master
+  git remote add upstream https://github.com/ErhardLabs/virtuoso-grandchild.git
+  git remote rm origin
 
   # update all plugins
   wp plugin update --all
@@ -121,16 +113,9 @@ install_themes() {
 
   cp -a "$(CONFIG DROPBOX_PATH)"/install-script/themes/* .
 
+  git clone https://github.com/ErhardLabs/virtuoso.git
+
   cd "$_wp_root_path"/wp-content/themes/virtuoso
-
-  # Grab the newest Viruoso install so we can grab the newest files
-  git init
-
-  git remote add origin https://github.com/ErhardLabs/virtuoso.git
-
-  git fetch --all
-
-  git reset --hard origin/master
 
   # Need to install all Virtuoso dependencies
   npm install && composer install
